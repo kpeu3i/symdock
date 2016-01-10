@@ -1,0 +1,4 @@
+.idea
+!data/.gitkeep
+!logs/.gitkeep
+!symfony/.gitkeep

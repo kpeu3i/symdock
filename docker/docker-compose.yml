@@ -1,0 +1,43 @@
+symfony:
+    build: ./symfony
+    volumes:
+        - ../symfony:/var/www/symfony
+        - ../logs/symfony:/var/www/logs
+    tty: true
+    environment:
+        DOCKER_HOST_UID: $DOCKER_HOST_UID
+        DOCKER_HOST_GID: $DOCKER_HOST_GID
+nginx:
+    build: ./nginx
+    ports:
+        - "8080:80"
+    links:
+        - php
+    volumes_from:
+        - symfony
+    volumes:
+        - ../data/nginx:/var/lib/nginx
+        - ../logs/nginx:/var/log/nginx
+    environment:
+        DOCKER_HOST_UID: $DOCKER_HOST_UID
+        DOCKER_HOST_GID: $DOCKER_HOST_GID
+php:
+    build: ./php
+    ports:
+        - "9000:9000"
+    volumes_from:
+        - symfony
+    links:
+        - mysql
+    environment:
+        DOCKER_HOST_UID: $DOCKER_HOST_UID
+        DOCKER_HOST_GID: $DOCKER_HOST_GID
+mysql:
+    build: ./mysql
+    ports:
+        - "3306:3306"
+    volumes:
+        - ../data/mysql/:/var/lib/mysql
+        - ../logs/mysql:/var/log/mysql
+    environment:
+        MYSQL_ROOT_PASSWORD: root
