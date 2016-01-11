@@ -1,4 +1,7 @@
 .idea
+symfony
+data
+logs
 !data/.gitkeep
 !logs/.gitkeep
 !symfony/.gitkeep
