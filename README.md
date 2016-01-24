@@ -4,7 +4,7 @@ A symfony project running on multiple Docker containers. Docker Compose is used 
 
 ## Requirements
 
-To use the SymDock, you must install [Docker](https://docs.docker.com/engine/installation/) and [Docker-Compose](https://docs.docker.com/compose/install/) or [Docker Toolbox](https://www.docker.com/docker-toolbox) on your computer.
+To use the SymDock, you must install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) or [Docker Toolbox](https://www.docker.com/docker-toolbox) on your computer.
     
 ## Installation
 
