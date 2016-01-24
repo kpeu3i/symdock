@@ -9,8 +9,4 @@ PROJECT=$(head -n 1 ./project)
 export SYMDOCK_HOST_UID=$(id -u)
 export SYMDOCK_HOST_GID=$(id -g)
 
-# Build and start containers
-docker-compose -p $PROJECT stop
-docker-compose -p $PROJECT rm --force
-docker-compose -p $PROJECT build --no-cache
 docker-compose -p $PROJECT up -d

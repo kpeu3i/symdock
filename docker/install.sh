@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# https://github.com/docker/compose/issues/45
+# Set project name (https://github.com/docker/compose/issues/45)
 PROJECT=$(head -n 1 ./project)
 
 rm -f ../symfony/.gitkeep

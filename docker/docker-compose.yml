@@ -1,16 +1,20 @@
 symfony:
-    build: ./symfony
+    build: .
+    dockerfile: ./symfony/ubuntu-15.10/Dockerfile
+    tty: true
     volumes:
         - ../symfony:/var/www/symfony
         - ../logs/symfony:/var/www/logs
-    tty: true
     environment:
-        DOCKER_HOST_UID: $DOCKER_HOST_UID
-        DOCKER_HOST_GID: $DOCKER_HOST_GID
+        SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+        SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+        SYMDOCK_CONTAINER_USER: www-data
+        SYMDOCK_CONTAINER_GROUP: www-data
 nginx:
-    build: ./nginx
+    build: .
+    dockerfile: ./nginx/1.9/Dockerfile
     ports:
-        - "8080:80"
+        - 8080:80
     links:
         - php
     volumes_from:
@@ -19,25 +23,51 @@ nginx:
         - ../data/nginx:/var/lib/nginx
         - ../logs/nginx:/var/log/nginx
     environment:
-        DOCKER_HOST_UID: $DOCKER_HOST_UID
-        DOCKER_HOST_GID: $DOCKER_HOST_GID
+        SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+        SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+        SYMDOCK_CONTAINER_USER: www-data
+        SYMDOCK_CONTAINER_GROUP: www-data
 php:
-    build: ./php
+    build: .
+    dockerfile: ./php/5.6/Dockerfile
     ports:
-        - "9000:9000"
+        - 9000:9000
     volumes_from:
         - symfony
     links:
         - mysql
     environment:
-        DOCKER_HOST_UID: $DOCKER_HOST_UID
-        DOCKER_HOST_GID: $DOCKER_HOST_GID
+        SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+        SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+        SYMDOCK_CONTAINER_USER: www-data
+        SYMDOCK_CONTAINER_GROUP: www-data
 mysql:
-    build: ./mysql
+    build: .
+    dockerfile: ./mysql/5.7/Dockerfile
     ports:
-        - "3306:3306"
+        - 3306:3306
     volumes:
-        - ../data/mysql/:/var/lib/mysql
+        - ../data/mysql:/var/lib/mysql
         - ../logs/mysql:/var/log/mysql
     environment:
         MYSQL_ROOT_PASSWORD: root
+rabbitmq:
+    build: .
+    dockerfile: ./rabbitmq/3.6-management/Dockerfile
+    volumes:
+        - ../data/rabbitmq:/var/lib/rabbitmq
+    ports:
+        - 5672:5672
+        - 15672:15672
+elasticsearch:
+    build: .
+    dockerfile: ./elasticsearch/1.7/Dockerfile
+    mem_limit: 2g
+    memswap_limit: 2g
+    volumes:
+        - ../data/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+        - 9200:9200
+        - 9300:9300
+    environment:
+        ES_HEAP_SIZE: 2g
