@@ -1,75 +1,107 @@
-symfony:
-    build: .
-    dockerfile: ./symfony/ubuntu-15.10/Dockerfile
-    tty: true
-    volumes:
-        - ../symfony:/var/www/symfony
-        - ../logs/symfony:/var/www/logs
-    environment:
-        SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
-        SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
-        SYMDOCK_CONTAINER_USER: www-data
-        SYMDOCK_CONTAINER_GROUP: www-data
-nginx:
-    build: .
-    dockerfile: ./nginx/1.9/Dockerfile
-    ports:
-        - 8080:80
-    links:
-        - php
-    volumes_from:
-        - symfony
-    volumes:
-        - ../data/nginx:/var/lib/nginx
-        - ../logs/nginx:/var/log/nginx
-    environment:
-        SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
-        SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
-        SYMDOCK_CONTAINER_USER: www-data
-        SYMDOCK_CONTAINER_GROUP: www-data
-php:
-    build: .
-    dockerfile: ./php/5.6/Dockerfile
-    #dockerfile: ./php/7/Dockerfile
-    #dockerfile: ./hhvm/latest/Dockerfile
-    ports:
-        - 9000:9000
-    volumes_from:
-        - symfony
-    links:
-        - mysql
-    environment:
-        SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
-        SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
-        SYMDOCK_CONTAINER_USER: www-data
-        SYMDOCK_CONTAINER_GROUP: www-data
-mysql:
-    build: .
-    dockerfile: ./mysql/5.7/Dockerfile
-    ports:
-        - 3306:3306
-    volumes:
-        - ../data/mysql:/var/lib/mysql
-        - ../logs/mysql:/var/log/mysql
-    environment:
-        MYSQL_ROOT_PASSWORD: root
-rabbitmq:
-    build: .
-    dockerfile: ./rabbitmq/3.6-management/Dockerfile
-    volumes:
-        - ../data/rabbitmq:/var/lib/rabbitmq
-    ports:
-        - 5672:5672
-        - 15672:15672
-elasticsearch:
-    build: .
-    dockerfile: ./elasticsearch/1.7/Dockerfile
-    mem_limit: 2g
-    memswap_limit: 2g
-    volumes:
-        - ../data/elasticsearch:/usr/share/elasticsearch/data
-    ports:
-        - 9200:9200
-        - 9300:9300
-    environment:
-        ES_HEAP_SIZE: 2g
+version: "2"
+services:
+    symfony:
+        build:
+            context: .
+            dockerfile: ./symfony/ubuntu-15.10/Dockerfile
+        tty: true
+        volumes:
+            - ../symfony:/var/www/symfony
+            - ../logs/symfony:/var/www/logs
+        environment:
+            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+            SYMDOCK_CONTAINER_USER: www-data
+            SYMDOCK_CONTAINER_GROUP: www-data
+    nginx:
+        build:
+            context: .
+            dockerfile: ./nginx/1.9/Dockerfile
+        ports:
+            - 8080:80
+        links:
+            - php
+        volumes_from:
+            - symfony
+        volumes:
+            - ../data/nginx:/var/lib/nginx
+            - ../logs/nginx:/var/log/nginx
+        environment:
+            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+            SYMDOCK_CONTAINER_USER: www-data
+            SYMDOCK_CONTAINER_GROUP: www-data
+    php:
+        build:
+            context: .
+            #dockerfile: ./php/5.6/Dockerfile
+            #dockerfile: ./php/7/Dockerfile
+            dockerfile: ./hhvm/latest/Dockerfile
+        ports:
+            - 9000:9000
+        volumes_from:
+            - symfony
+        links:
+            - mysql
+        environment:
+            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+            SYMDOCK_CONTAINER_USER: www-data
+            SYMDOCK_CONTAINER_GROUP: www-data
+    node:
+        build:
+            context: .
+            dockerfile: ./node/wheezy/Dockerfile
+        tty: true
+        volumes_from:
+            - symfony
+        environment:
+            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+            SYMDOCK_CONTAINER_USER: www-data
+            SYMDOCK_CONTAINER_GROUP: www-data
+    ruby:
+        build:
+            context: .
+            dockerfile: ./ruby/2.3/Dockerfile
+        tty: true
+        volumes_from:
+            - symfony
+        environment:
+            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+            SYMDOCK_CONTAINER_USER: www-data
+            SYMDOCK_CONTAINER_GROUP: www-data
+    mysql:
+        build:
+            context: .
+            dockerfile: ./mysql/5.7/Dockerfile
+        ports:
+            - 3306:3306
+        volumes:
+            - ../data/mysql:/var/lib/mysql
+            - ../logs/mysql:/var/log/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+    rabbitmq:
+        build:
+            context: .
+            dockerfile: ./rabbitmq/3.6-management/Dockerfile
+        volumes:
+            - ../data/rabbitmq:/var/lib/rabbitmq
+        ports:
+            - 5672:5672
+            - 15672:15672
+    elasticsearch:
+        build:
+            context: .
+            dockerfile: ./elasticsearch/1.7/Dockerfile
+        mem_limit: 2g
+        memswap_limit: 2g
+        volumes:
+            - ../data/elasticsearch:/usr/share/elasticsearch/data
+        ports:
+            - 9200:9200
+            - 9300:9300
+        environment:
+            ES_HEAP_SIZE: 2g

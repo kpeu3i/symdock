@@ -32,4 +32,6 @@ RUN apt-get -y update && \
 
 RUN rm -rf /etc/php/7.0/fpm/pool.d/www.conf && mkdir -p /run/php
 
+WORKDIR /var/www/symfony
+
 CMD ["sh", "-c", "/scripts/php/start.sh ; /usr/sbin/php-fpm7.0 -F"]

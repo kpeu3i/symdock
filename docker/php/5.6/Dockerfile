@@ -15,6 +15,8 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN locale-gen en_US.UTF-8
 
 RUN apt-get update && apt-get install -y \
+    git \
+    curl \
     php5-common \
     php5-cli \
     php5-fpm \
@@ -25,5 +27,9 @@ RUN apt-get update && apt-get install -y \
     php5-imagick \
     php5-curl \
     php5-intl
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+WORKDIR /var/www/symfony
 
 CMD ["sh", "-c", "/scripts/php/start.sh ; php5-fpm -F"]

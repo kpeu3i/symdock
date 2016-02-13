@@ -4,7 +4,7 @@ A symfony project running on multiple Docker containers. Docker Compose is used 
 
 ## Requirements
 
-To use the SymDock, you must install [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) or [Docker Toolbox](https://www.docker.com/docker-toolbox) on your computer.
+To use the SymDock, you must install **latest** [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) or [Docker Toolbox](https://www.docker.com/docker-toolbox) on your computer.
     
 ## Installation
 
@@ -22,9 +22,9 @@ To use the SymDock, you must install [Docker](https://docs.docker.com/engine/ins
     
         $ ./build.sh
     
-5. Put your Symfony application into `symfony` folder or run `install.sh` script:
+5. Put your Symfony application into `symfony` folder or run `symfony.sh` script:
     
-        $ ./install.sh
+        $ ./symfony.sh
 
 You are done! Your project is available at http://127.0.0.1:8080 (for OS X, check your ip `docker-machine ip dev`). 
 

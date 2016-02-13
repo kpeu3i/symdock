@@ -2,7 +2,7 @@
 
 set -e
 
-# Set project name (https://github.com/docker/compose/issues/45)
+# Set project name (https://github.com/docker/compose/issues/745)
 PROJECT=$(head -n 1 ./project)
 
 # Export user and group ids

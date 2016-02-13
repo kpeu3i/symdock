@@ -9,4 +9,4 @@ PROJECT=$(head -n 1 ./project)
 export SYMDOCK_HOST_UID=$(id -u)
 export SYMDOCK_HOST_GID=$(id -g)
 
-docker-compose -p $PROJECT up -d
+docker-compose -p $PROJECT ps
