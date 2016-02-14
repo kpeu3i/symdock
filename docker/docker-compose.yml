@@ -7,7 +7,6 @@ services:
         tty: true
         volumes:
             - ../symfony:/var/www/symfony
-            - ../logs/symfony:/var/www/logs
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
@@ -21,11 +20,15 @@ services:
             - 8080:80
         links:
             - php
+            - fluentd
         volumes_from:
             - symfony
         volumes:
             - ../data/nginx:/var/lib/nginx
-            - ../logs/nginx:/var/log/nginx
+        logging:
+            driver: fluentd
+            options:
+                fluentd-tag: "nginx.docker.{{.Name }}"
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
@@ -34,9 +37,9 @@ services:
     php:
         build:
             context: .
-            #dockerfile: ./php/5.6/Dockerfile
+            dockerfile: ./php/5.6/Dockerfile
             #dockerfile: ./php/7/Dockerfile
-            dockerfile: ./hhvm/latest/Dockerfile
+            #dockerfile: ./hhvm/latest/Dockerfile
         ports:
             - 9000:9000
         volumes_from:
@@ -80,7 +83,6 @@ services:
             - 3306:3306
         volumes:
             - ../data/mysql:/var/lib/mysql
-            - ../logs/mysql:/var/log/mysql
         environment:
             MYSQL_ROOT_PASSWORD: root
     rabbitmq:
@@ -95,7 +97,7 @@ services:
     elasticsearch:
         build:
             context: .
-            dockerfile: ./elasticsearch/1.7/Dockerfile
+            dockerfile: ./elasticsearch/2.2/Dockerfile
         mem_limit: 2g
         memswap_limit: 2g
         volumes:
@@ -105,3 +107,21 @@ services:
             - 9300:9300
         environment:
             ES_HEAP_SIZE: 2g
+    kibana:
+        build:
+            context: .
+            dockerfile: ./kibana/4.4/Dockerfile
+        links:
+            - elasticsearch
+        ports:
+            - 5601:5601
+    fluentd:
+        build:
+            context: .
+            dockerfile: ./fluentd/latest/Dockerfile
+        links:
+            - elasticsearch
+        ports:
+            - 24224:24224
+        volumes:
+            - ../logs/fluentd:/fluentd/log
