@@ -40,10 +40,14 @@ Start containers:
     
     $ ./start.sh
     
+Check containers status:
+    
+    $ ./status.sh
+    
 ## Running a command
 
-You can run one-shot command inside the `symfony` service container (replace the prefix `symdock` in container name `symdock_symfony_1` with the actual project name):
+You can run one-shot command inside any service container (replace `symdock` in service name with actual project name), for example:
 
-    docker exec -u www-data -it symdock_symfony_1 composer app/console cache:clear
+    docker exec -u www-data -it symdock_php_1 composer app/console cache:clear
 
     
