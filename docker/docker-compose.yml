@@ -34,6 +34,10 @@ services:
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
             SYMDOCK_CONTAINER_USER: www-data
             SYMDOCK_CONTAINER_GROUP: www-data
+    memcached:
+        build:
+            context: .
+            dockerfile: ./memcached/1.4/Dockerfile
     php:
         build:
             context: .
@@ -46,6 +50,7 @@ services:
             - symfony
         links:
             - mysql
+            - memcached
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
@@ -58,6 +63,8 @@ services:
         tty: true
         volumes_from:
             - symfony
+        links:
+            - memcached
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
@@ -70,6 +77,8 @@ services:
         tty: true
         volumes_from:
             - symfony
+        links:
+            - memcached
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID

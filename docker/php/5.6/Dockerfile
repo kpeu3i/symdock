@@ -26,7 +26,8 @@ RUN apt-get update && apt-get install -y \
     php5-gd \
     php5-imagick \
     php5-curl \
-    php5-intl
+    php5-intl \
+    php5-memcache
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
