@@ -1,5 +1,7 @@
 .idea
+/symfony
 /symfony/*
 /data/*
 /logs/*
-!*/.gitkeep
+!*.gitkeep
+!*.gitignore
