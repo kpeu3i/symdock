@@ -16,8 +16,6 @@ services:
         build:
             context: .
             dockerfile: ./nginx/1.9/Dockerfile
-        ports:
-            - 8080:80
         links:
             - php
             - fluentd
@@ -25,6 +23,8 @@ services:
             - symfony
         volumes:
             - ../data/nginx:/var/lib/nginx
+        ports:
+            - 8080:80
         logging:
             driver: fluentd
             options:
@@ -44,8 +44,6 @@ services:
             dockerfile: ./php/5.6/Dockerfile
             #dockerfile: ./php/7/Dockerfile
             #dockerfile: ./hhvm/latest/Dockerfile
-        ports:
-            - 9000:9000
         volumes_from:
             - symfony
         links:
