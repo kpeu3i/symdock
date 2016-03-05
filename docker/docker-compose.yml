@@ -16,8 +16,6 @@ services:
         build:
             context: .
             dockerfile: ./nginx/1.9/Dockerfile
-        ports:
-            - 8080:80
         links:
             - php
             - fluentd
@@ -25,6 +23,8 @@ services:
             - symfony
         volumes:
             - ../data/nginx:/var/lib/nginx
+        ports:
+            - 8080:80
         logging:
             driver: fluentd
             options:
@@ -34,18 +34,21 @@ services:
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
             SYMDOCK_CONTAINER_USER: www-data
             SYMDOCK_CONTAINER_GROUP: www-data
+    memcached:
+        build:
+            context: .
+            dockerfile: ./memcached/1.4/Dockerfile
     php:
         build:
             context: .
             dockerfile: ./php/5.6/Dockerfile
             #dockerfile: ./php/7/Dockerfile
             #dockerfile: ./hhvm/latest/Dockerfile
-        ports:
-            - 9000:9000
         volumes_from:
             - symfony
         links:
             - mysql
+            - memcached
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
@@ -58,6 +61,8 @@ services:
         tty: true
         volumes_from:
             - symfony
+        links:
+            - memcached
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
@@ -70,6 +75,8 @@ services:
         tty: true
         volumes_from:
             - symfony
+        links:
+            - memcached
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
