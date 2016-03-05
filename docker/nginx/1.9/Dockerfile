@@ -3,7 +3,7 @@ FROM nginx:1.9
 MAINTAINER Andrey Bukatov <andrey.bukatov@gmail.com>
 
 COPY ./scripts /scripts
-COPY ./nginx/1.9/scripts /scripts/niginx
+COPY ./nginx/1.9/scripts /scripts/nginx
 COPY ./nginx/1.9/nginx.conf /etc/nginx/nginx.conf
 COPY ./nginx/1.9/upstream.conf /etc/nginx/conf.d/upstream.conf
 COPY ./nginx/1.9/symfony.conf /etc/nginx/sites-enabled/symfony.conf
