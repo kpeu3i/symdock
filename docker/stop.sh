@@ -2,11 +2,9 @@
 
 set -e
 
-# Set project name (https://github.com/docker/compose/issues/745)
-PROJECT=$(head -n 1 ./project)
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Export user and group ids
-export SYMDOCK_HOST_UID=$(id -u)
-export SYMDOCK_HOST_GID=$(id -g)
+# Export environment variables
+source "$SCRIPT_PATH/config.env" && export $(cut -d= -f1 "$SCRIPT_PATH/config.env")
 
-docker-compose -p $PROJECT stop
+docker-compose -p "$SYMDOCK_PROJECT_NAME" -f "$SCRIPT_PATH/docker-compose.yml" stop

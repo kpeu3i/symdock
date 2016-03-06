@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 RUN locale-gen en_US.UTF-8
 
-RUN mkdir -p /var/www/symfony /var/www/logs
+RUN mkdir -p /var/www/symfony
 
 WORKDIR /var/www/symfony
 

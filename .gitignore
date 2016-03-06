@@ -1,7 +1,8 @@
 .idea
 /symfony
-/symfony/*
-/data/*
-/logs/*
+/db
+/data
+/logs
+/docker/config.env
 !*.gitkeep
 !*.gitignore

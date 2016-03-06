@@ -9,6 +9,9 @@ COPY ./hhvm/latest/scripts /scripts/hhvm
 COPY ./hhvm/latest/server.ini /etc/hhvm/server.ini
 COPY ./hhvm/latest/php.ini /etc/hhvm/php.ini
 
+ARG SYMDOCK_SSH_PUBLIC_KEY
+ARG SYMDOCK_SSH_PRIVATE_KEY
+
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
@@ -22,6 +25,11 @@ RUN add-apt-repository "deb http://dl.hhvm.com/ubuntu $(lsb_release -sc) main"
 RUN apt-get update
 RUN apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" --force-yes install ${HHVM_VERSION}
 RUN apt-get clean && apt-get autoremove -y
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN mkdir -p /var/www/.ssh
+RUN bash -c 'echo -e "$SYMDOCK_SSH_PRIVATE_KEY" > /var/www/.ssh/id_rsa'
 
 WORKDIR /var/www/symfony
 

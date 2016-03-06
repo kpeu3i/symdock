@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# Set project name (https://github.com/docker/compose/issues/745)
-PROJECT=$(head -n 1 ./project)
+SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-rm -f ../symfony/.gitkeep
+# Export environment variables
+source "$SCRIPT_PATH/config.env" && export $(cut -d= -f1 "$SCRIPT_PATH/config.env")
 
-docker exec -u www-data -it "$PROJECT"_php_1 composer create-project symfony/framework-standard-edition /var/www/symfony/ "2.8.*"
+docker exec -u www-data -it "$SYMDOCK_PROJECT_NAME"_php_1 composer create-project symfony/framework-standard-edition /var/www/symfony/ "2.8.*"
 

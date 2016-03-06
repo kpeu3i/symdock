@@ -5,8 +5,12 @@ services:
             context: .
             dockerfile: ./symfony/ubuntu-15.10/Dockerfile
         tty: true
+        links:
+            - fluentd
         volumes:
-            - ../symfony:/var/www/symfony
+            - $SYMDOCK_SYMFONY_VOLUME_PATH:/var/www/symfony
+        logging:
+            driver: fluentd
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
@@ -38,31 +42,28 @@ services:
         build:
             context: .
             dockerfile: ./memcached/1.4/Dockerfile
+        links:
+            - fluentd
+        logging:
+            driver: fluentd
     php:
         build:
             context: .
             dockerfile: ./php/5.6/Dockerfile
             #dockerfile: ./php/7/Dockerfile
             #dockerfile: ./hhvm/latest/Dockerfile
-        volumes_from:
-            - symfony
+            args:
+                SYMDOCK_SSH_PRIVATE_KEY: $SYMDOCK_SSH_PRIVATE_KEY
         links:
             - mysql
+            - elasticsearch
+            - rabbitmq
             - memcached
-        environment:
-            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
-            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
-            SYMDOCK_CONTAINER_USER: www-data
-            SYMDOCK_CONTAINER_GROUP: www-data
-    node:
-        build:
-            context: .
-            dockerfile: ./node/wheezy/Dockerfile
-        tty: true
+            - fluentd
         volumes_from:
             - symfony
-        links:
-            - memcached
+        logging:
+            driver: fluentd
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
@@ -72,11 +73,43 @@ services:
         build:
             context: .
             dockerfile: ./ruby/2.3/Dockerfile
+            args:
+                SYMDOCK_SSH_PRIVATE_KEY: $SYMDOCK_SSH_PRIVATE_KEY
         tty: true
+        links:
+            - nginx
+            - mysql
+            - elasticsearch
+            - rabbitmq
+            - memcached
+            - fluentd
         volumes_from:
             - symfony
+        logging:
+            driver: fluentd
+        environment:
+            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+            SYMDOCK_CONTAINER_USER: www-data
+            SYMDOCK_CONTAINER_GROUP: www-data
+    node:
+        build:
+            context: .
+            dockerfile: ./node/wheezy/Dockerfile
+            args:
+                SYMDOCK_SSH_PRIVATE_KEY: $SYMDOCK_SSH_PRIVATE_KEY
+        tty: true
         links:
+            - nginx
+            - mysql
+            - elasticsearch
+            - rabbitmq
             - memcached
+            - fluentd
+        volumes_from:
+            - symfony
+        logging:
+            driver: fluentd
         environment:
             SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
             SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
@@ -86,40 +119,79 @@ services:
         build:
             context: .
             dockerfile: ./mysql/5.7/Dockerfile
-        ports:
-            - 3306:3306
+        links:
+            - fluentd
         volumes:
             - ../data/mysql:/var/lib/mysql
+            - $SYMDOCK_MYSQL_DB_VOLUME_PATH:/db
+        ports:
+            - 3306:3306
+        logging:
+            driver: fluentd
         environment:
             MYSQL_ROOT_PASSWORD: root
+            SYMDOCK_MYSQL_DB_FILENAME: $SYMDOCK_MYSQL_DB_FILENAME
     rabbitmq:
         build:
             context: .
             dockerfile: ./rabbitmq/3.6-management/Dockerfile
+        links:
+            - fluentd
         volumes:
             - ../data/rabbitmq:/var/lib/rabbitmq
         ports:
             - 5672:5672
             - 15672:15672
+        logging:
+            driver: fluentd
     elasticsearch:
         build:
             context: .
-            dockerfile: ./elasticsearch/2.2/Dockerfile
-        mem_limit: 2g
-        memswap_limit: 2g
+            dockerfile: ./elasticsearch/1.7/Dockerfile
+        mem_limit: 4g
+        memswap_limit: 4g
+        links:
+            - fluentd
         volumes:
             - ../data/elasticsearch:/usr/share/elasticsearch/data
         ports:
             - 9200:9200
             - 9300:9300
+        logging:
+            driver: fluentd
         environment:
-            ES_HEAP_SIZE: 2g
+            ES_HEAP_SIZE: 4g
+    phpmyadmin:
+        build:
+            context: .
+            dockerfile: ./phpmyadmin/4.5.5/Dockerfile
+        links:
+            - mysql
+            - fluentd
+        ports:
+            - 8081:80
+        logging:
+            driver: fluentd
+        environment:
+            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
+            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
+            SYMDOCK_CONTAINER_USER: www-data
+            SYMDOCK_CONTAINER_GROUP: www-data
+    elasticsearch_logs:
+        build:
+            context: .
+            dockerfile: ./elasticsearch/2.2/Dockerfile
+        volumes:
+            - ../data/elasticsearch_logs:/usr/share/elasticsearch/data
+        ports:
+            - 9201:9200
+            - 9301:9300
     kibana:
         build:
             context: .
             dockerfile: ./kibana/4.4/Dockerfile
         links:
-            - elasticsearch
+            - elasticsearch_logs
         ports:
             - 5601:5601
     fluentd:
@@ -127,7 +199,7 @@ services:
             context: .
             dockerfile: ./fluentd/latest/Dockerfile
         links:
-            - elasticsearch
+            - elasticsearch_logs
         ports:
             - 24224:24224
         volumes:

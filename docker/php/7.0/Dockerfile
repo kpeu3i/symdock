@@ -7,7 +7,10 @@ COPY ./php/7.0/scripts /scripts/php
 
 COPY ./php/7.0/php_cli.ini /etc/php/7.0/fpm/php.ini
 COPY ./php/7.0/php_fpm.ini /etc/php/7.0/fpm/php
-COPY ./php/7.0/symfony.pool.conf /etc/php/7.0/fpm/pool.d/symfony.pool.conf
+COPY ./php/7.0/pool.conf /etc/php/7.0/fpm/pool.d/pool.conf
+
+ARG SYMDOCK_SSH_PUBLIC_KEY
+ARG SYMDOCK_SSH_PRIVATE_KEY
 
 ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
@@ -31,6 +34,11 @@ RUN apt-get -y update && \
     php7.0-json
 
 RUN rm -rf /etc/php/7.0/fpm/pool.d/www.conf && mkdir -p /run/php
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+RUN mkdir -p /var/www/.ssh
+RUN bash -c 'echo -e "$SYMDOCK_SSH_PRIVATE_KEY" > /var/www/.ssh/id_rsa'
 
 WORKDIR /var/www/symfony
 
