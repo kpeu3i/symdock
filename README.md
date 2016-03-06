@@ -100,6 +100,6 @@ If you want to import your database, follow the steps below:
 
 2. Run import command:
     
-        $ docker exec -it contentoff_mysql_1 /scripts/mysql/import.sh username password dbname
+        $ docker exec -it symdock_mysql_1 /scripts/mysql/import.sh username password dbname
 
     
