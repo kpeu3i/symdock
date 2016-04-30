@@ -20,15 +20,14 @@ For more details, see https://github.com/adlogix/docker-machine-nfs
     
 ## Installation
 
-1. Clone this repository:
+1. Create project directories:
 
-        $ git clone git@github.com:kpeu3i/symdock.git    
+        $ mkdir ~/symdock/{symfony,environment,db} && cd ~/symdock 
+
+2. Clone this repository:
+
+        $ git clone git@github.com:kpeu3i/symdock.git environment
     
-2. Go to the cloned repository directory and create some extra folders:
-    
-        $ mkdir -p ./symfony
-        $ mkdir -p ./db
-        
 3. Go to the `docker` folder:
        
         $ cd docker
@@ -43,7 +42,7 @@ For more details, see https://github.com/adlogix/docker-machine-nfs
     
 6. Put your Symfony application into `symfony` folder or run `symfony.sh` script to install it:
     
-        $ ./symfony.sh
+        $ ./symfony.sh "2.8"
 
 You are done! Your project is available at http://127.0.0.1:8080 (for OS X, check your ip `docker-machine ip dev`). 
 
