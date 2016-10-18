@@ -1,8 +1,6 @@
 .idea
 /symfony
-/db
-/data
-/logs
-/docker/config.env
+.env
+id_rsa
 !*.gitkeep
 !*.gitignore
