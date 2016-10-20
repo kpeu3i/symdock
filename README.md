@@ -22,7 +22,7 @@ For more details, see https://github.com/adlogix/docker-machine-nfs
 
 1. Create project directories:
 
-        $ mkdir ~/symdock/{symfony,environment,db} && cd ~/symdock 
+        $ mkdir -p ~/symdock/{symfony,environment,db} && cd ~/symdock 
 
 2. Clone this repository:
 
@@ -60,7 +60,6 @@ In the `config.env` file you can define environment variables for a project like
 * SYMDOCK_PROJECT_NAME - project name
 * SYMDOCK_SYMFONY_VOLUME_PATH - path to Symfony app, will be shared among containers
 * SYMDOCK_MYSQL_DB_VOLUME_PATH - path to directory with MySQL dumpfile, will be mounted into mysql container 
-* SYMDOCK_MYSQL_DB_FILENAME - MySQL dump filename
 * SYMDOCK_SSH_PRIVATE_KEY - private key, will be copied into images
 * SYMDOCK_HOST_UID - host user id, will be mapped with www-data uid in containers 
 * SYMDOCK_HOST_GID - host group id, will be mapped with www-data gid in containers
@@ -95,10 +94,12 @@ You can run one-shot command inside any service container, for example:
 
 If you want to import your database, follow the steps below:
     
-1. Put your dumpfile `SYMDOCK_MYSQL_DB_FILENAME` into `SYMDOCK_MYSQL_DB_VOLUME_PATH`
+1. Put your dumpfile into `SYMDOCK_MYSQL_DB_VOLUME_PATH`
 
-2. Run import command:
+2. Run import commands:
     
-        $ docker exec -it symdock_mysql_1 /scripts/mysql/import.sh username password dbname
+        $ docker exec -it symdock_mysql_1 mysql -h 127.0.0.1 -P3306 -u username -p password -e "drop database if exists $3; create database dbname;"
+
+        $ docker exec -it symdock_mysql_1 pv "/db/dump.sql" | mysql -h 127.0.0.1 -P3306 -u username -p password dbname
 
     

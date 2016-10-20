@@ -1,7 +1,23 @@
-include .env
+UID = $(shell id -u)
+GID = $(shell id -g)
+PWD = $(shell pwd)
+COMPOSE_PROJECT_NAME ?= symdock
 
-init:
-	cp -n .env.dist .env
+init: config-init ssh-private-key-init symfony-clone build up composer-install
+
+config-init:
+ifeq ("$(wildcard .env)","")
+	sed \
+	-e "s%COMPOSE_PROJECT_NAME=%COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}%g" \
+	-e "s%SYMDOCK_SYMFONY_VOLUME_PATH=%SYMDOCK_SYMFONY_VOLUME_PATH=${PWD}/symfony%g" \
+	-e "s%SYMDOCK_PRIVATE_KEY_FILENAME=%SYMDOCK_PRIVATE_KEY_FILENAME=$$HOME/.ssh/id_rsa%g" \
+	-e "s%SYMDOCK_HOST_UID=%SYMDOCK_HOST_UID=${UID}%g" \
+	-e "s%SYMDOCK_HOST_GID=%SYMDOCK_HOST_GID=${GID}%g" \
+	".env.dist" > ".env"
+endif
+
+ssh-private-key-init:
+	touch id_rsa
 
 status:
 	docker-compose ps
