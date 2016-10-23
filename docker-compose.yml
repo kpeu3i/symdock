@@ -9,7 +9,6 @@ services:
             - php
             - fluentd
         volumes:
-            - symfony_volume:/var/www/symfony
             - nginx_volume:/var/lib/nginx
         ports:
             - $SYMDOCK_NGINX_PORT:80
@@ -18,16 +17,11 @@ services:
             options:
                 fluentd-address: "localhost:$SYMDOCK_FLUENTD_PORT"
                 tag: "nginx.docker.{{.Name }}"
-        environment:
-            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
-            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
-            SYMDOCK_CONTAINER_USER: www-data
-            SYMDOCK_CONTAINER_GROUP: www-data
     php:
         build:
             context: .
             dockerfile: ./php/5.6/Dockerfile
-            #dockerfile: ./php/7/Dockerfile
+            #dockerfile: ./php/7.0/Dockerfile
             #dockerfile: ./hhvm/latest/Dockerfile
         depends_on:
             - mysql
@@ -35,17 +29,10 @@ services:
             - rabbitmq
             - memcached
             - fluentd
-        volumes:
-            - symfony_volume:/var/www/symfony
         logging:
             driver: fluentd
             options:
                 fluentd-address: "localhost:$SYMDOCK_FLUENTD_PORT"
-        environment:
-            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
-            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
-            SYMDOCK_CONTAINER_USER: www-data
-            SYMDOCK_CONTAINER_GROUP: www-data
     memcached:
         build:
             context: .
@@ -129,32 +116,8 @@ services:
         ports:
             - $SYMDOCK_ELASTICSEARCH_LOGS_API_PORT:9200
             - $SYMDOCK_ELASTICSEARCH_LOGS_SERVICE_PORT:9300
-    phpmyadmin:
-        build:
-            context: .
-            dockerfile: ./phpmyadmin/4.5.5/Dockerfile
-        depends_on:
-            - mysql
-            - fluentd
-        ports:
-            - $SYMDOCK_PHPMYADMIN_PORT:80
-        logging:
-            driver: fluentd
-            options:
-                fluentd-address: "localhost:$SYMDOCK_FLUENTD_PORT"
-        environment:
-            SYMDOCK_HOST_UID: $SYMDOCK_HOST_UID
-            SYMDOCK_HOST_GID: $SYMDOCK_HOST_GID
-            SYMDOCK_CONTAINER_USER: www-data
-            SYMDOCK_CONTAINER_GROUP: www-data
 
 volumes:
-    symfony_volume:
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: $SYMDOCK_SYMFONY_VOLUME_PATH
     nginx_volume:
         driver: local
     mysql_volume:

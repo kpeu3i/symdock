@@ -1,0 +1,21 @@
+version: "2"
+
+services:
+    nginx:
+        image: $COMPOSE_PROJECT_NAME/nginx:1.9
+    php:
+        image: $COMPOSE_PROJECT_NAME/php:5.6
+    memcached:
+        image: $COMPOSE_PROJECT_NAME/memcached:1.4
+    mysql:
+        image: $COMPOSE_PROJECT_NAME/mysql:5.7
+    rabbitmq:
+        image: $COMPOSE_PROJECT_NAME/rabbitmq:3.6-management
+    elasticsearch:
+        image: $COMPOSE_PROJECT_NAME/elasticsearch:1.7
+    kibana:
+        image: $COMPOSE_PROJECT_NAME/kibana:4.4
+    fluentd:
+        image: $COMPOSE_PROJECT_NAME/fluentd:0.12.26
+    elasticsearch_logs:
+        image: $COMPOSE_PROJECT_NAME/elasticsearch_logs:2.2

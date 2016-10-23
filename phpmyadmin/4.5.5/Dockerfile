@@ -11,7 +11,6 @@ COPY ./phpmyadmin/4.5.5/php_fpm.ini /etc/php5/fpm/php.ini
 COPY ./phpmyadmin/4.5.5/supervisord.conf /supervisord.conf
 
 ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN locale-gen en_US.UTF-8

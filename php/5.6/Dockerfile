@@ -14,23 +14,16 @@ ARG SYMFONY_ENV=prod
 
 ENV LANG=en_US.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
-ENV GOSU_VERSION=1.7
 
 RUN locale-gen en_US.UTF-8
 
-RUN set -x \
-	&& apt-get update && apt-get install -y --no-install-recommends ca-certificates wget && rm -rf /var/lib/apt/lists/* \
-	&& wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-	&& wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-	&& gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-	&& rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
-	&& chmod +x /usr/local/bin/gosu \
-	&& gosu nobody true \
-	&& apt-get purge -y --auto-remove ca-certificates wget
+# Enable PHP 5.6 repo and update apt-get
+RUN echo "deb http://ppa.launchpad.net/ondrej/php5-5.6/ubuntu trusty main" >> /etc/apt/sources.list && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-key E5267A6C && \
+    apt-get update
 
-RUN apt-get update && apt-get install -y \
+# Install common packages
+RUN apt-get install -y \
     git \
     curl \
     php5-common \
@@ -45,6 +38,10 @@ RUN apt-get update && apt-get install -y \
     php5-intl \
     php5-memcache
 
+# Tidy up
+RUN apt-get -y autoremove && apt-get clean && apt-get autoclean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
@@ -55,10 +52,12 @@ RUN chmod 600 /var/www/.ssh/id_rsa
 
 WORKDIR /var/www/symfony
 
-# Init Symfony
-RUN gosu www-data composer install --prefer-dist --no-dev --no-scripts --optimize-autoloader --no-interaction
-RUN gosu www-data app/console assets:install --symlink
-RUN gosu www-data app/console cache:warmup
+USER www-data
+
+# Install Symfony vendors
+RUN composer install --prefer-dist --no-dev --no-scripts --optimize-autoloader --no-interaction
+
+USER root
 
 # Remove SSH private key
 RUN rm -f /var/www/.ssh/id_rsa

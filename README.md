@@ -4,7 +4,7 @@ A symfony project running on multiple Docker containers. Docker Compose is used 
 
 ## Dependencies
 
-To use the SymDock, you must install the **latest** [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) or [Docker Toolbox](https://www.docker.com/docker-toolbox) on your computer.
+To use the SymDock, you must install the **latest** version of [Docker](https://docs.docker.com/engine/installation/) and [Docker Compose](https://docs.docker.com/compose/install/) or [Docker Toolbox](https://www.docker.com/docker-toolbox) on your computer.
 
 #### Activate NFS (OS X only)
     
@@ -20,86 +20,88 @@ For more details, see https://github.com/adlogix/docker-machine-nfs
     
 ## Installation
 
-1. Create project directories:
+1. Clone this repository:
 
-        $ mkdir -p ~/symdock/{symfony,environment,db} && cd ~/symdock 
+        $ git clone git@github.com:kpeu3i/symdock.git ~/symdock
 
-2. Clone this repository:
-
-        $ git clone git@github.com:kpeu3i/symdock.git environment
-    
-3. Go to the `docker` folder:
+2. Go to the cloned folder:
        
-        $ cd docker
+        $ cd ~/symdock 
+           
+3. Run:
+       
+        $ make init
         
-4. Add `config.env` file (just copy `config.env.sample` to the `config.env`)
-         
-         $ cp ./config.env.sample ./config.env
-    
-5. Run `build.sh` script:
-    
-        $ ./build.sh
-    
-6. Put your Symfony application into `symfony` folder or run `symfony.sh` script to install it:
-    
-        $ ./symfony.sh "2.8"
-
-You are done! Your project is available at http://127.0.0.1:8080 (for OS X, check your ip `docker-machine ip dev`). 
+You are done! Fresh Symfony application is available at http://127.0.0.1:8080 (for OS X, check your ip `docker-machine ip dev`). 
 
 Other services:
 
-* phpMyAdmin: http://127.0.0.1:8081/
 * RabbitMQ: http://127.0.0.1:15672/
 * Elasticsearch: http://127.0.0.1:9200/
 * Kibana: http://127.0.0.1:5601/
+* PhpMyAdmin (only in dev): http://127.0.0.1:8081/
 
 ## Advanced configuration
 
-In the `config.env` file you can define environment variables for a project like:
-    
-* SYMDOCK_PROJECT_NAME - project name
-* SYMDOCK_SYMFONY_VOLUME_PATH - path to Symfony app, will be shared among containers
-* SYMDOCK_MYSQL_DB_VOLUME_PATH - path to directory with MySQL dumpfile, will be mounted into mysql container 
-* SYMDOCK_SSH_PRIVATE_KEY - private key, will be copied into images
-* SYMDOCK_HOST_UID - host user id, will be mapped with www-data uid in containers 
-* SYMDOCK_HOST_GID - host group id, will be mapped with www-data gid in containers
+You can adapt `.env` file to your needs:
 
-After modification, it is needed to rebuild images.
+* COMPOSE_PROJECT_NAME - project name
+* SYMDOCK_SYMFONY_VOLUME_PATH - absolute path to Symfony directory to share your code among containers (only in dev)
+* SYMDOCK_PRIVATE_KEY_FILENAME - absolute path to ssh private key to access a private repositories from containers (optional)
+* SYMDOCK_HOST_UID - host uid to map it with "www-data" uid in containers (only in dev)
+* SYMDOCK_HOST_GID - host guid to map it with "www-data" gid in containers (only in dev)
+* SYMDOCK_SYMFONY_REPOSITORY - ssh or https url to git repository with a Symfony application
+* SYMDOCK_SYMFONY_REPOSITORY_BRANCH - custom git branch (optional)
+* SYMDOCK_COMPOSER_CONTAINER - container to run composer commands 
+* SYMDOCK_NGINX_PORT - Nginx port
+* SYMDOCK_MYSQL_PORT - MySql port
+* SYMDOCK_RABBITMQ_NODE_PORT - RabbitMQ port
+* SYMDOCK_RABBITMQ_MANAGER_PORT - RabbitMQ web-admin port
+* SYMDOCK_ELASTICSEARCH_API_PORT - Elasticsearch web-api port
+* SYMDOCK_ELASTICSEARCH_SERVICE_PORT - Elasticsearch TCP transport port
+* SYMDOCK_ELASTICSEARCH_LOGS_API_PORT - Elasticsearch (logs) api port
+* SYMDOCK_ELASTICSEARCH_LOGS_SERVICE_PORT - Elasticsearch (logs) TCP transport port
+* SYMDOCK_PHPMYADMIN_PORT - PhpMyAdmin web-admin port
+* SYMDOCK_KIBANA_PORT - Kibana web-admin port
+* SYMDOCK_FLUENTD_PORT - Fluentd port
 
 ## Useful scripts
 
-Rebuild all Docker images:
+Build all Docker images:
 
-    $ ./build.sh
+    $ make build
+
+Force rebuild all Docker images:
+
+    $ make rebuild
+
+Check containers status:
+    
+    $ make status
 
 Stop containers:
     
-    $ ./stop.sh
+    $ make stop
 
 Start containers:
     
-    $ ./start.sh
+    $ make start
     
-Check containers status:
+Start containers:
     
-    $ ./status.sh
+    $ make restart
+
+Install composer packages:
+
+    $ make composer-install
+    
+Update composer packages:
+
+    $ make composer-update
     
 ## Run a command
 
-You can run one-shot command inside any service container, for example:
+You can run one-shot command inside any container, for example:
 
-    $ docker exec -u www-data -it symdock_php_1 composer app/console cache:clear
-
-## Import MySQL dumpfile
-
-If you want to import your database, follow the steps below:
-    
-1. Put your dumpfile into `SYMDOCK_MYSQL_DB_VOLUME_PATH`
-
-2. Run import commands:
-    
-        $ docker exec -it symdock_mysql_1 mysql -h 127.0.0.1 -P3306 -u username -p password -e "drop database if exists $3; create database dbname;"
-
-        $ docker exec -it symdock_mysql_1 pv "/db/dump.sql" | mysql -h 127.0.0.1 -P3306 -u username -p password dbname
-
+    $ docker-compose exec --user www-data php app/console cache:clear
     
